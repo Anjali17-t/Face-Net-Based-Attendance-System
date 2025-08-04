@@ -1,0 +1,63 @@
+<!-- attendance/templates/attendance.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Face Attendance</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 20px; }
+    video { border: 2px solid #444; border-radius: 10px; }
+    #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>🎥 Webcam Attendance System</h2>
+  <video id="video" width="640" height="480" autoplay></video><br><br>
+  <button onclick="capture()">📸 Mark Attendance</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <p id="result">Webcam ready. Press the button to mark attendance.</p>
+
+  <script>
+    const video = document.getElementById('video');
+    const result = document.getElementById('result');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+    video.srcObject = stream;
+    result.innerText = "✅ Webcam started successfully.";
+  })
+  .catch(err => {
+    console.error("Webcam error:", err.name, err.message);
+    result.innerText = `❌ Webcam error: ${err.name} - ${err.message}`;
+  });
+
+
+    function capture() {
+      const canvas = document.getElementById('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/jpeg');
+
+      fetch('/mark_attendance/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ image: dataURL })
+      })
+      .then(response => response.json())
+      .then(data => {
+        result.innerText = data.message;
+        result.style.color = data.message.includes("✅") ? "green" : "red";
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        result.innerText = "❌ Failed to mark attendance.";
+        result.style.color = "red";
+      });
+    }
+  </script>
+</body>
+</html>

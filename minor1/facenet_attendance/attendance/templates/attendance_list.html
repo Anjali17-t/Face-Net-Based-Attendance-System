@@ -1,0 +1,9 @@
+
+<h2>✅ Attendance List</h2>
+<ul>
+  {% for r in records %}
+    <li>{{ r.name }} - {{ r.timestamp|date:"Y-m-d H:i:s" }}</li>
+  {% empty %}
+    <li>No attendance yet.</li>
+  {% endfor %}
+</ul>

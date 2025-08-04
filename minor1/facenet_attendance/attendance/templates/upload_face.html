@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload New Face</title>
+</head>
+<body>
+    <h1>Upload New Face to Attendance System</h1>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Name:</label>
+        <input type="text" name="name" required>
+        <br><br>
+        <label>Choose Image:</label>
+        <input type="file" name="image" accept="image/*" required>
+        <br><br>
+        <button type="submit">Upload & Update</button>
+    </form>
+</body>
+</html>
